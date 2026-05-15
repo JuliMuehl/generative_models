@@ -115,15 +115,6 @@ class GroundTruthRenderer:
         directions = np.frombuffer(self.direction_texture.read(), dtype=np.uint8).reshape(direction_shape)
         return colors, directions
 
-class VoxelGridRenderer:
-    def __init__(self, density_grid, color_grid, ctx=None):
-        if ctx is None:
-            self.ctx = moderngl.create_context(standalone=True)
-        else:
-            self.ctx = ctx
-        self.density_texture = ctx.texutre3d(density_grid.shape[1:], components=density_grid.shape[0], data=density_grid, dtype="f4")
-        self.color_grid = ctx.texture3d(color_crid.shape[1:], components=color_grid.shape[0], data=color_grid, dtype="f4")
-
 if __name__ == "__main__":
     import json
     from PIL import Image
