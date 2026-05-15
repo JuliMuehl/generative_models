@@ -15,7 +15,7 @@ def unit_sphere(theta, phi, dtype=np.float32):
         np.sin(theta) * np.sin(phi),
     ]
 
-class Renderer:
+class GroundTruthRenderer:
     vertex_shader_source = """
     #version 330
     in vec2 in_uv;
@@ -56,14 +56,15 @@ class Renderer:
     void main(){
         vec3 ray_origin = -u_frame * vec3(0.0, 0.0, 1.0);
         vec3 ray_direction = normalize(u_frame * vec3(2.0 * frag_uv - 1.0, 1.0));
-        float sphere_radius = 0.1;
-        vec3 sphere_origin = vec3(0.0, 2 * sphere_radius, 0.0);
+        float sphere_radius = 0.3;
+        vec3 sphere_origin = vec3(0.0, sphere_radius, 0.0);
         float tsphere = intersect_ray_sphere(ray_origin, ray_direction, sphere_origin, sphere_radius);
         float tplane = intersect_ray_yplane(ray_origin, ray_direction);
         float t = -1.0;
-        vec3 col = vec3(0.0);
-        col = vec3(0.9);
+        vec3 col = vec3(1.0);
+        float mask = 0.0;
         if(tsphere > 0.0 && (tsphere < t || t < 0)){
+            mask = 1.0;
             t = tsphere;
             col = (vec3(1.0) + (ray_origin + t * ray_direction) / sphere_radius) / 2.0;
         }
@@ -72,6 +73,7 @@ class Renderer:
             vec3 xyz = (ray_origin + t * ray_direction);
             if(abs(xyz.x) <= 1.0 && abs(xyz.z) <= 1.0){
                 vec2 xz = round(10 * xyz.xz);
+                mask = 1.0;
                 if(mod(xz.x + xz.y, 2.0) == 1.0){
                     col = vec3(0.8);
                 }else{
@@ -84,8 +86,11 @@ class Renderer:
     }
     """
 
-    def __init__(self):
-        self.ctx = moderngl.create_context(standalone=True)
+    def __init__(self, ctx=None):
+        if ctx is None:
+            self.ctx = moderngl.create_context(standalone=True)
+        else:
+            self.ctx = ctx
         self.ctx.pixel_pack_alignment = 1
         uv_data = np.array([[0, 0], [1,0], [1,1], [0, 0], [0,1], [1,1]]).astype(np.float32)
         self.uv_buffer = self.ctx.buffer(uv_data)
@@ -94,6 +99,8 @@ class Renderer:
         self.viewport = (512, 512)
         self.color_texture = self.ctx.texture(self.viewport, components=3)
         self.direction_texture = self.ctx.texture(self.viewport, components=3)
+        self.color_texture.use(location=0)
+        self.direction_texture.use(location=1)
         self.framebuffer = self.ctx.framebuffer(color_attachments=(self.color_texture,self.direction_texture))
 
     def render(self, x = [0, 0.4, -1], up = [0, 1, 0]):
@@ -101,23 +108,41 @@ class Renderer:
         frame = tangent_frame(x, up)
         self.program.get("u_frame", default=None).write(np.ascontiguousarray(frame.T))
         self.vao.render()
-        output_shape = (self.viewport[1], self.viewport[0], 3)
-        colors = np.frombuffer(self.color_texture.read(), dtype=np.uint8).reshape(output_shape)
-        directions = np.frombuffer(self.direction_texture.read(), dtype=np.uint8).reshape(output_shape)
+        color_shape = (self.viewport[1], self.viewport[0], 3)
+        direction_shape = (self.viewport[1], self.viewport[0], 3)
+        colors = np.frombuffer(self.color_texture.read(), dtype=np.uint8).reshape(color_shape)
+        directions = np.frombuffer(self.direction_texture.read(), dtype=np.uint8).reshape(direction_shape)
         return colors, directions
+
+class VoxelGridRenderer:
+    def __init__(self, density_grid, color_grid, ctx=None):
+        if ctx is None:
+            self.ctx = moderngl.create_context(standalone=True)
+        else:
+            self.ctx = ctx
+        self.density_texture = ctx.texutre3d(density_grid.shape[1:], components=density_grid.shape[0], data=density_grid, dtype="f4")
+        self.color_grid = ctx.texture3d(color_crid.shape[1:], components=color_grid.shape[0], data=color_grid, dtype="f4")
+
 if __name__ == "__main__":
     import json
     from PIL import Image
     import os
-    positions = [unit_sphere(theta,phi) for theta in np.linspace(np.pi/8, np.pi/3, 8) for phi in np.linspace(0, 2 * np.pi, 8)]
-    renderer = Renderer()
-    image_dir = "images"
-    for i, pos in enumerate(positions):
-        colors, directions = renderer.render(x = pos)
-        colors, directions = Image.fromarray(colors), Image.fromarray(directions)
-        colors.save(os.path.join(image_dir, f"img{i}.png"))
-        directions.save(os.path.join(image_dir,f"dirs{i}.png"))
 
-    with open(os.path.join(image_dir, "camera_poses.json"), "w") as f:
-        json.dump({"camera_positions":positions},f)
-
+    def render_and_save(renderer, image_dir, positions):
+        if not os.path.exists(image_dir):
+            os.mkdir(image_dir)
+        for i, pos in enumerate(positions):
+            colors, directions= renderer.render(x = pos)
+            colors, directions= Image.fromarray(colors), Image.fromarray(directions)
+            colors.save(os.path.join(image_dir, f"img{i}.png"))
+            directions.save(os.path.join(image_dir,f"dirs{i}.png"))
+        with open(os.path.join(image_dir, "camera_poses.json"), "w") as f:
+            json.dump({"camera_positions":positions},f)
+    
+    renderer = GroundTruthRenderer()
+    train_positions = [unit_sphere(theta,phi) for theta in np.linspace(np.pi/8, np.pi/3, 16) for phi in np.linspace(0, 2 * np.pi, 16)]
+    train_image_dir = "train_images"
+    render_and_save(renderer, train_image_dir, train_positions)
+    test_positions = [unit_sphere(theta+0.1 * np.random.random(),phi + np.random.randn()) for theta in np.linspace(np.pi/8, np.pi/3, 8) for phi in np.linspace(0, 2 * np.pi, 8)]
+    test_image_dir = "test_images"
+    render_and_save(renderer, test_image_dir, test_positions)
