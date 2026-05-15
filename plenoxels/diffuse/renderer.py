@@ -1,5 +1,6 @@
 import moderngl
 import numpy as np
+from tqdm import tqdm
 
 def tangent_frame(x, up, dtype=np.float32):
         res = np.eye(3, dtype=dtype)
@@ -131,7 +132,7 @@ if __name__ == "__main__":
     def render_and_save(renderer, image_dir, positions):
         if not os.path.exists(image_dir):
             os.mkdir(image_dir)
-        for i, pos in enumerate(positions):
+        for i, pos in tqdm(list(enumerate(positions))):
             colors, directions= renderer.render(x = pos)
             colors, directions= Image.fromarray(colors), Image.fromarray(directions)
             colors.save(os.path.join(image_dir, f"img{i}.png"))
@@ -142,7 +143,9 @@ if __name__ == "__main__":
     renderer = GroundTruthRenderer()
     train_positions = [unit_sphere(theta,phi) for theta in np.linspace(np.pi/8, np.pi/3, 16) for phi in np.linspace(0, 2 * np.pi, 16)]
     train_image_dir = "train_images"
+    print("Generating Training Images:")
     render_and_save(renderer, train_image_dir, train_positions)
     test_positions = [unit_sphere(theta+0.1 * np.random.random(),phi + np.random.randn()) for theta in np.linspace(np.pi/8, np.pi/3, 8) for phi in np.linspace(0, 2 * np.pi, 8)]
     test_image_dir = "test_images"
+    print("Generating Test  Images:")
     render_and_save(renderer, test_image_dir, test_positions)
