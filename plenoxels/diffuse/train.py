@@ -9,7 +9,7 @@ from model import DiffuseVoxelGrid
 
 if __name__ == "__main__":
     device = "xpu" if torch.xpu.is_available() else "cpu"
-    model = DiffuseVoxelGrid(scale=1, N=64, tv_loss_weight=1e-5, sparsity_loss_weight=1e-5).to(device)
+    model = DiffuseVoxelGrid(scale=1, N=64, tv_loss_weight=1e-4, sparsity_loss_weight=1e-4).to(device)
     image_dir = "train_images"
     with open(os.path.join(image_dir, "camera_poses.json")) as f:
         camera_positions = np.array(json.load(f)["camera_positions"])
@@ -36,17 +36,16 @@ if __name__ == "__main__":
 
     optimizer = torch.optim.AdamW([{'params':model.color_grid, 'lr' : 1e-1}, {'params':model.density_grid, 'lr':3.0}])
     n_splits = 512 
-    epochs, batch_size = 8000, len(colors.view(-1,3)) // n_splits
+    epochs, batch_size = 6000, len(colors.view(-1,3)) // n_splits
     pbar = tqdm(range(epochs))
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=1e-3 ** (1.0 / epochs))
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=1e-2 ** (1.0 / epochs))
     for epoch in pbar:
         batch_idx = torch.randint(colors.view(-1, 3).shape[0], (batch_size,)).to(device)
         batch_colors = colors.view(-1, 3)[batch_idx, :]
         batch_dirs = dirs.view(-1, 3)[batch_idx, :]
         batch_origins = origins.view(-1, 3)[batch_idx, :]
         optimizer.zero_grad()
-        calc_tv_loss = epoch % n_splits == 0
-        _, loss = model.forward(batch_origins, batch_dirs, targets=batch_colors, calc_tv_loss = calc_tv_loss)
+        _, loss = model.forward(batch_origins, batch_dirs, targets=batch_colors, calc_tv_loss = True)
         loss.backward()
         optimizer.step()
         pbar.set_description(f"loss = {loss.item()}")
