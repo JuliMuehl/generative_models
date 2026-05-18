@@ -1,0 +1,7 @@
+**/__pycache__
+.venv/
+*.pk
+*.npz
+*.pt
+projects/plenoxels/diffuse/train_images
+src/generative_models.egg-info
