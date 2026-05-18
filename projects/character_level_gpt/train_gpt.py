@@ -1,5 +1,6 @@
 from generative_models.gpt import GPTModel
 from generative_models.gpt.tokenizers import CharacterLevelTokenizer
+from generative_models.utils import get_device
 
 import torch
 import torch.optim
@@ -18,7 +19,7 @@ def causal_batch(token_data, context_size, batch_size):
     return x, y
 
 if __name__ == "__main__":
-    device = "xpu" if torch.xpu.is_available() else "cpu"
+    device = get_device() 
     with open("training_data/odysee.txt", "r", encoding="utf-8") as f:
         text = f.read()
     tokenizer = CharacterLevelTokenizer(text)

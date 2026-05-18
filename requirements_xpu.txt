@@ -3,6 +3,9 @@ moderngl
 glfw
 pillow
 tqdm
+matplotlib
+jupyter
 --extra-index-url https://download.pytorch.org/whl/xpu
 torch
-jupyter
+torchvision
+torchtext

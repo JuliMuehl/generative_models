@@ -1,5 +1,7 @@
 **/__pycache__
+**/.ipynb_checkpoints
 .venv/
 *.pk
 *.npz
 *.pt
+src/generative_models.egg-info

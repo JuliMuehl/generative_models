@@ -1,18 +1,16 @@
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
-import matplotlib.pyplot as plt
-from variational_autoencoder import VariationalAutoencoder
+from generative_models.utils import get_device
+from generative_models.vae import VariationalAutoencoder
 from tqdm import tqdm
 import sys
 
 if __name__ == "__main__":
     mnist = MNIST(root="./mnist_data", download=True)
     mnist_data = mnist.data.to(torch.float32) / 255.0
-    plt.imshow(mnist_data[0, :, :])
-    plt.show()
 
-    device = "xpu" if torch.xpu.is_available() else "cpu"
+    device = get_device() 
     if len(sys.argv) > 1 and sys.argv[1].lower().startswith("resume"):
         print("Loading VAE")
         vae = torch.load("./mnist_vae.pt", weights_only=False)

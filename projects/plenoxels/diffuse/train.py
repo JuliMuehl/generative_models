@@ -6,9 +6,10 @@ from tqdm import tqdm
 from PIL import Image
 
 from generative_models.plenoxels.diffuse import DiffuseVoxelGrid
+from generative_models.utils import get_device
 
 if __name__ == "__main__":
-    device = "xpu" if torch.xpu.is_available() else "cpu"
+    device = get_device()
     model = DiffuseVoxelGrid(scale=1, N=64, tv_loss_weight=1e-4, sparsity_loss_weight=1e-4).to(device)
     image_dir = "train_images"
     with open(os.path.join(image_dir, "camera_poses.json")) as f:

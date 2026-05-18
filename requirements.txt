@@ -3,5 +3,9 @@ moderngl
 glfw
 pillow
 tqdm
-torch
 jupyter
+matplotlib
+torch
+torchvision
+torchtext
+
