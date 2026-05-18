@@ -1,0 +1,7 @@
+numpy
+moderngl
+glfw
+pillow
+tqdm
+torch
+jupyter
