@@ -9,7 +9,7 @@ class DiffuseVoxelGrid(torch.nn.Module):
         self.scale = scale
         self.N = N
         self.color_grid = torch.nn.Parameter(0.2 * torch.randn(1, 3, N, N, N))
-        self.density_grid = torch.nn.Parameter(-20 * torch.ones(1, 1, N, N, N))
+        self.density_grid = torch.nn.Parameter(-1.0 * torch.ones(1, 1, N, N, N))
         self.tv_loss_weight = tv_loss_weight
         self.sparsity_loss_weight = sparsity_loss_weight
         self.softplus_beta = softplus_beta

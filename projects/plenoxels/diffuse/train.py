@@ -35,7 +35,7 @@ if __name__ == "__main__":
     dirs   = torch.tensor(dirs, dtype=torch.float).to(device)
     origins = torch.tensor(origins, dtype=torch.float).to(device)
 
-    optimizer = torch.optim.AdamW([{'params':model.color_grid, 'lr' : 1e-1}, {'params':model.density_grid, 'lr':3.0}])
+    optimizer = torch.optim.AdamW([{'params':model.color_grid, 'lr' : 1e-2}, {'params':model.density_grid, 'lr':1.0}])
     n_splits = 512 
     epochs, batch_size = 1000, len(colors.view(-1,3)) // n_splits
     pbar = tqdm(range(epochs))
