@@ -5,3 +5,4 @@
 *.npz
 *.pt
 src/generative_models.egg-info
+projects/plenoxels/diffuse/train_images

@@ -10,7 +10,7 @@ from generative_models.utils import get_device
 
 if __name__ == "__main__":
     device = get_device()
-    model = DiffuseVoxelGrid(scale=1, N=64, tv_loss_weight=1e-4, sparsity_loss_weight=1e-4).to(device)
+    model = DiffuseVoxelGrid(scale=1, N=64, tv_loss_weight=1e-2, sparsity_loss_weight=1e-2).to(device)
     image_dir = "train_images"
     with open(os.path.join(image_dir, "camera_poses.json")) as f:
         camera_positions = np.array(json.load(f)["camera_positions"])
@@ -35,9 +35,9 @@ if __name__ == "__main__":
     dirs   = torch.tensor(dirs, dtype=torch.float).to(device)
     origins = torch.tensor(origins, dtype=torch.float).to(device)
 
-    optimizer = torch.optim.AdamW([{'params':model.color_grid, 'lr' : 1e-2}, {'params':model.density_grid, 'lr':1.0}])
+    optimizer = torch.optim.AdamW([{'params':model.color_grid, 'lr' : 1e-2}, {'params':model.density_grid, 'lr':5.0}])
     n_splits = 512 
-    epochs, batch_size = 1000, len(colors.view(-1,3)) // n_splits
+    epochs, batch_size = 2048, len(colors.view(-1,3)) // n_splits
     pbar = tqdm(range(epochs))
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=1e-2 ** (1.0 / epochs))
     for epoch in pbar:
