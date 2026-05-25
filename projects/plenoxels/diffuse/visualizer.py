@@ -14,7 +14,7 @@ def main():
     window = glfw.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, __file__, None, None)
     glfw.make_context_current(window)
     ctx = moderngl.create_context()
-    
+
     voxel_renderer = VoxelRenderer(ctx=ctx)
     groundtruth_renderer = GroundTruthRenderer(ctx=ctx)
     phi, theta = 0.0, 2*np.pi/5
@@ -32,8 +32,7 @@ def main():
         groundtruth_renderer.set_viewport(512, 0, 512, 512)
         groundtruth_renderer.render_to_screen(x = camera_pos)
         glfw.poll_events()
-        voxel_renderer.load_textures()
+        voxel_renderer.load_grid()
 
 if __name__ == "__main__":
     main()
-    

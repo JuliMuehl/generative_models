@@ -5,7 +5,7 @@ import json
 from tqdm import tqdm
 from PIL import Image
 
-from generative_models.plenoxels.diffuse import DiffuseVoxelGrid
+from generative_models.plenoxels import DiffuseVoxelGrid
 from generative_models.utils import get_device
 
 if __name__ == "__main__":

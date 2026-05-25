@@ -6,3 +6,4 @@
 *.pt
 src/generative_models.egg-info
 projects/plenoxels/diffuse/train_images
+projects/plenoxels/plenoptic/train_images
