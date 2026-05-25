@@ -81,7 +81,6 @@ class GroundTruthRenderer:
             self.ctx = moderngl.create_context(standalone=True)
         else:
             self.ctx = ctx
-        self.ctx.pixel_pack_alignment = 1
         uv_data = np.array([[0, 0], [1,0], [1,1], [0, 0], [0,1], [1,1]]).astype(np.float32)
         self.uv_buffer = self.ctx.buffer(uv_data)
         self.program = self.ctx.program(self.vertex_shader_source, self.fragment_shader_source)
@@ -165,7 +164,6 @@ class VoxelRenderer:
             self.ctx = moderngl.create_context(standalone=True)
         else:
             self.ctx = ctx
-        self.ctx.pixel_pack_alignment = 1
         uv_data = np.array([[0, 0], [1,0], [1,1], [0, 0], [0,1], [1,1]]).astype(np.float32)
         self.uv_buffer = self.ctx.buffer(uv_data)
         self.program = self.ctx.program(self.vertex_shader_source, self.fragment_shader_source)
@@ -229,7 +227,7 @@ class SH2VoxelRenderer:
             vec3 coeff = texture(u_sh2[i], xtex).xyz;
             color += sh2_C[i] * sh[i] * coeff;
         }
-        return color;
+        return max(vec3(0.0), color);
     }
 
     void main(){
@@ -266,7 +264,6 @@ class SH2VoxelRenderer:
             self.ctx = moderngl.create_context(standalone=True)
         else:
             self.ctx = ctx
-        self.ctx.pixel_pack_alignment = 1
         uv_data = np.array([[0, 0], [1,0], [1,1], [0, 0], [0,1], [1,1]]).astype(np.float32)
         self.uv_buffer = self.ctx.buffer(uv_data)
         self.program = self.ctx.program(self.vertex_shader_source, self.fragment_shader_source)
@@ -288,11 +285,11 @@ class SH2VoxelRenderer:
                 if self.sh2_textures is None or self.density_grid_texture is None:
                     self.sh2_textures = [self.ctx.texture3d(size=sh2_grid.shape[1:-1], components = sh2_grid.shape[-1], dtype="f4") for i in range(9)]
                     self.density_grid_texture = self.ctx.texture3d(size=density_grid.shape[:-1], components = 1, dtype="f4")
-                    for i in range(9):
-                        self.sh2_textures[i].filter = (moderngl.LINEAR,moderngl.LINEAR)
-                        self.sh2_textures[i].write(sh2_grid[i].astype(np.float32))
-                    self.density_grid_texture.filter = (moderngl.LINEAR,moderngl.LINEAR)
-                    self.density_grid_texture.write(density_grid.astype(np.float32))
+                for i in range(9):
+                    self.sh2_textures[i].filter = (moderngl.LINEAR,moderngl.LINEAR)
+                    self.sh2_textures[i].write(sh2_grid[i].astype(np.float32))
+                self.density_grid_texture.filter = (moderngl.LINEAR,moderngl.LINEAR)
+                self.density_grid_texture.write(density_grid.astype(np.float32))
             self.grid_mtime = os.path.getmtime(self.grid_file)
 
     def render_to_screen(self, x = [0, 0.4, -1], up = [0, 1, 0]):
