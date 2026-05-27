@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 class DiffuseVoxelGrid(torch.nn.Module):
-    def __init__(self, scale, N, tv_loss_weight=1e-3, sparsity_loss_weight = 1.0, bg_rgb = [1.0, 1.0, 1.0], softplus_beta = 1e1):
+    def __init__(self, N, tv_loss_weight=1e-3, sparsity_loss_weight = 1.0, bg_rgb = [1.0, 1.0, 1.0], softplus_beta = 1e1):
         super().__init__()
         self.N = N
         self.color_grid = torch.nn.Parameter(0.2 * torch.randn(1, 3, N, N, N))
