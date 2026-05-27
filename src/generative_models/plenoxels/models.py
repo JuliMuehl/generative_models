@@ -41,7 +41,7 @@ class DiffuseVoxelGrid(torch.nn.Module):
     def forward(self, ray_origins, ray_directions, targets=None, num_samples=32, calc_tv_loss = False):
         device = next(self.parameters()).device
         t = torch.linspace(0, 2.0, num_samples).to(device)
-        xyz = ray_origins[:, None, :] / self.scale + t[None, :, None] * ray_directions[:, None, :]
+        xyz = ray_origins[:, None, :] + t[None, :, None] * ray_directions[:, None, :]
         colors, densities = self.sample(xyz)
         alpha = 1.0 - torch.exp(-densities*(t[1] - t[0]))
         transmittance = torch.cumprod(1.0 - alpha, dim=1) 
@@ -139,7 +139,7 @@ class SH2VoxelGrid(torch.nn.Module):
         device = next(self.parameters()).device
         t = torch.linspace(0, 2.0, num_samples).to(device)
         # [num_rays , num_samples , 3]
-        xyz = ray_origins[:, None, :] / self.scale + t[None, :, None] * ray_directions[:, None, :]
+        xyz = ray_origins[:, None, :] + t[None, :, None] * ray_directions[:, None, :]
         colors, densities = self.sample(xyz, ray_directions)
         alpha = 1.0 - torch.exp(-densities*(t[1] - t[0]))
         transmittance = torch.cumprod(1.0 - alpha, dim=1)
