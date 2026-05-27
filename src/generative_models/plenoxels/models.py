@@ -6,7 +6,6 @@ import os
 class DiffuseVoxelGrid(torch.nn.Module):
     def __init__(self, scale, N, tv_loss_weight=1e-3, sparsity_loss_weight = 1.0, bg_rgb = [1.0, 1.0, 1.0], softplus_beta = 1e1):
         super().__init__()
-        self.scale = scale
         self.N = N
         self.color_grid = torch.nn.Parameter(0.2 * torch.randn(1, 3, N, N, N))
         self.density_grid = torch.nn.Parameter(-1.0 * torch.ones(1, 1, N, N, N))
@@ -65,24 +64,38 @@ class DiffuseVoxelGrid(torch.nn.Module):
 
 
 class SH2VoxelGrid(torch.nn.Module):
-    def __init__(self, scale, N, tv_loss_weight=1e-3, sparsity_loss_weight = 1.0, bg_rgb = [1.0, 1.0, 1.0], softplus_beta = 1e1):
+    def __init__(self, N, tv_loss_weight=1e-3, sparsity_loss_weight = 1.0, bg_rgb = [1.0, 1.0, 1.0], softplus_beta = 1e1, mode="plenoptic"):
         super().__init__()
-        self.scale = scale
         self.N = N
         self.density_grid = torch.nn.Parameter(-1.0 * torch.ones(1, 1, N, N, N))
         pi = np.pi
-        self.register_buffer("sh2_C", 0.5 * torch.tensor([
+        self.plenoptic_C = list(map(lambda x: 0.5 * x**0.5, [
             1/pi,
             3/pi, 3/pi, 3/pi,
             15/pi, 15/pi, 15/pi, 0.25*5/pi, 0.25*15/pi,
-        ]).sqrt())
+        ]))
+        self.diffuse_C = [1.0] + [0] * 8
+        self.register_buffer("sh2_C", torch.zeros(9))
+        self.mode = mode
+        self.set_mode(mode)
         self.sh2_grid = torch.nn.Parameter(0.1 * torch.ones(1, 3*9, N, N, N))
         self.tv_loss_weight = tv_loss_weight
         self.sparsity_loss_weight = sparsity_loss_weight
         self.softplus_beta = softplus_beta
         self.register_buffer("bg_rgb", torch.tensor(bg_rgb, dtype=torch.float))
         pi = np.pi
-
+    
+    def set_mode(self, mode):
+        mode = mode.lower()
+        if mode == "diffuse":
+            self.sh2_C[:] = torch.tensor(self.diffuse_C)
+        else:
+            self.sh2_C[:] = torch.tensor(self.plenoptic_C)
+        if self.mode == "diffuse" and mode != self.mode:
+            with torch.no_grad():
+                self.sh2_grid *= 1.0 / self.plenoptic_C[0]
+        self.mode = mode
+    
     def eval_sh2(self, dirs, coeffs):
         x, y, z = dirs[:, 0][:, None], dirs[:, 1][:, None], dirs[:, 2][:, None]
         C = self.sh2_C

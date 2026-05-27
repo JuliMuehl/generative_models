@@ -1,4 +1,4 @@
-from generative_models.plenoxels.renderers import GroundTruthRenderer, VoxelRenderer
+from generative_models.plenoxels.renderers import DiffuseSceneRenderer, VoxelRenderer
 from generative_models.plenoxels.renderers.utils import *
 
 import moderngl
@@ -16,7 +16,7 @@ def main():
     ctx = moderngl.create_context()
 
     voxel_renderer = VoxelRenderer(ctx=ctx)
-    groundtruth_renderer = GroundTruthRenderer(ctx=ctx)
+    groundtruth_renderer = DiffuseSceneRenderer(ctx=ctx)
     phi, theta = 0.0, 2*np.pi/5
     camera_pos = unit_sphere(theta, phi)
     while not glfw.window_should_close(window):

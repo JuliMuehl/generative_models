@@ -1,4 +1,4 @@
-from generative_models.plenoxels.renderers import GroundTruthRenderer, SH2VoxelRenderer
+from generative_models.plenoxels.renderers import SpecularSceneRenderer, SH2VoxelRenderer
 from generative_models.plenoxels.renderers.utils import *
 
 import moderngl
@@ -15,7 +15,7 @@ def main():
     glfw.make_context_current(window)
     ctx = moderngl.create_context()
     voxel_renderer = SH2VoxelRenderer(ctx=ctx)
-    groundtruth_renderer = GroundTruthRenderer(ctx=ctx)
+    groundtruth_renderer = SpecularSceneRenderer(ctx=ctx)
     phi, theta = 0.0, 2*np.pi/5
     camera_pos = unit_sphere(theta, phi)
     while not glfw.window_should_close(window):

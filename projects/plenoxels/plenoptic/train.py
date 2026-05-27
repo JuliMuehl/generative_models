@@ -35,8 +35,8 @@ if __name__ == "__main__":
     dirs   = torch.tensor(dirs, dtype=torch.float).to(device)
     origins = torch.tensor(origins, dtype=torch.float).to(device)
 
-    optimizer = torch.optim.AdamW([{'params':model.sh2_grid, 'lr' : 1e-2}, {'params':model.density_grid, 'lr':5.0}])
-    n_splits = 512
+    optimizer = torch.optim.AdamW([{'params':model.sh2_grid, 'lr' : 1e-2}, {'params':model.density_grid, 'lr':10.0}])
+    n_splits = 1024
     epochs, batch_size = 2048, len(colors.view(-1,3)) // n_splits
     pbar = tqdm(range(epochs))
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=1e-2 ** (1.0 / epochs))

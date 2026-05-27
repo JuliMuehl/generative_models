@@ -2,7 +2,7 @@ import moderngl
 import numpy as np
 from .utils import *
 import os
-
+from . import shaders
 
 class GroundTruthRenderer:
     vertex_shader_source = """
@@ -14,76 +14,14 @@ class GroundTruthRenderer:
         gl_Position = vec4(2.0 * in_uv - 1.0, 0.0, 1.0);
     }
     """
-    fragment_shader_source = """
-    #version 330
-    in vec2 frag_uv;
-    layout(location = 0) out vec3 frag_color;
-    layout(location = 1) out vec3 frag_direction;
-    uniform mat3 u_frame;
-
-    float intersect_ray_sphere(vec3 o, vec3 d, vec3 x, float r){
-        o = o - x;
-        float a = 1;
-        float b = 2*dot(o,d);
-        float c = dot(o,o) - r*r;
-        float radicant = b*b - 4*a*c;
-        if(radicant > 0){
-            float s = sqrt(radicant);
-            float t1 = (-b + s) / (2*a);
-            float t2 = (-b - s) / (2*a);
-            if(t1 < 0) return t2;
-            if(t2 < 0) return t1;
-            return min(t1, t2);
-        }
-        return -1.0;
-    }
-
-    float intersect_ray_yplane(vec3 o, vec3 d){
-        return -o.y/d.y;
-    }
-
-    void main(){
-        vec3 ray_origin = -u_frame * vec3(0.0, 0.0, 1.0);
-        vec2 uv = vec2(frag_uv.x, 1.0 - frag_uv.y);
-        vec3 ray_direction = normalize(u_frame * vec3(2.0 * uv - 1.0, 1.0));
-        float sphere_radius = 0.3;
-        vec3 sphere_origin = vec3(0.0, sphere_radius, 0.0);
-        float tsphere = intersect_ray_sphere(ray_origin, ray_direction, sphere_origin, sphere_radius);
-        float tplane = intersect_ray_yplane(ray_origin, ray_direction);
-        float t = -1.0;
-        vec3 col = vec3(1.0);
-        float mask = 0.0;
-        if(tsphere > 0.0 && (tsphere < t || t < 0)){
-            mask = 1.0;
-            t = tsphere;
-            col = (vec3(1.0) + (ray_origin + t * ray_direction) / sphere_radius) / 2.0;
-        }
-        if(tplane > 0.0 && (tplane < t || t < 0)){
-            t = tplane;
-            vec3 xyz = (ray_origin + t * ray_direction);
-            if(abs(xyz.x) <= 1.0 && abs(xyz.z) <= 1.0){
-                vec2 xz = round(10 * xyz.xz);
-                mask = 1.0;
-                if(mod(xz.x + xz.y, 2.0) == 1.0){
-                    col = vec3(0.8);
-                }else{
-                    col = vec3(0.1);
-                }
-            }
-        }
-        frag_color = col;
-        frag_direction = 0.5 * (ray_direction + vec3(1.0));
-    }
-    """
-
-    def __init__(self, ctx=None):
+    def __init__(self, fragment_shader_source, ctx=None):
         if ctx is None:
             self.ctx = moderngl.create_context(standalone=True)
         else:
             self.ctx = ctx
         uv_data = np.array([[0, 0], [1,0], [1,1], [0, 0], [0,1], [1,1]]).astype(np.float32)
         self.uv_buffer = self.ctx.buffer(uv_data)
-        self.program = self.ctx.program(self.vertex_shader_source, self.fragment_shader_source)
+        self.program = self.ctx.program(self.vertex_shader_source, fragment_shader_source)
         self.vao = self.ctx.vertex_array(self.program, self.uv_buffer, "in_uv")
         self.viewport = (512, 512)
         self.color_texture = self.ctx.texture(self.viewport, components=3)
@@ -111,6 +49,14 @@ class GroundTruthRenderer:
         frame = tangent_frame(x, up)
         self.program["u_frame"].write(np.ascontiguousarray(frame.T))
         self.vao.render()
+
+class DiffuseSceneRenderer(GroundTruthRenderer):
+    def __init__(self, ctx = None):
+        super().__init__(ctx = ctx, fragment_shader_source = shaders.get("diffuse_frag.glsl"))
+
+class SpecularSceneRenderer(GroundTruthRenderer):
+    def __init__(self, ctx = None):
+        super().__init__(ctx = ctx, fragment_shader_source = shaders.get("specular_frag.glsl"))
 
 class VoxelRenderer:
     vertex_shader_source = """
@@ -218,14 +164,14 @@ class SH2VoxelRenderer:
     uniform sampler3D u_sh2[9];
     uniform mat3 u_frame;
     const int num_samples = 32;
-    const float sh2_C[] =  {0.28209478, 0.48860252, 0.48860252, 0.48860252, 1.0925485, 1.0925485, 1.0925485, 0.31539157, 0.54627424};
+    uniform float u_sh2_C[9];
 
     vec3 eval_sh2_color(vec3 xtex, vec3 d){
         float sh[9] = {1.0, d.x, d.y, d.z, d.x*d.y, d.y*d.z, d.z*d.x, 3.0 * d.z*d.z - 1.0, d.x*d.x - d.y*d.y};
         vec3 color = vec3(0.0);
         for(int i = 0; i < 9;i++){
             vec3 coeff = texture(u_sh2[i], xtex).xyz;
-            color += sh2_C[i] * sh[i] * coeff;
+            color += u_sh2_C[i] * sh[i] * coeff;
         }
         return max(vec3(0.0), color);
     }
@@ -298,6 +244,7 @@ class SH2VoxelRenderer:
         self.program["u_frame"].write(np.ascontiguousarray(frame.T))
         self.program["u_density_grid"] = 0
         self.density_grid_texture.use(0)
+        self.program["u_sh2_C"].write(np.ascontiguousarray(self.sh2_C))
         self.program["u_sh2"] = list(range(1,10))
         for i, sh2_tex in enumerate(self.sh2_textures):
             sh2_tex.use(i+1)

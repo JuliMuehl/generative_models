@@ -1,4 +1,4 @@
-from generative_models.plenoxels.renderers import GroundTruthRenderer
+from generative_models.plenoxels.renderers import DiffuseSceneRenderer 
 from generative_models.plenoxels.renderers.utils import *
 
 import json
@@ -21,8 +21,8 @@ def render_and_save(renderer, image_dir, positions):
         json.dump({"camera_positions":positions},f)
 
 def main():    
-    renderer = GroundTruthRenderer()
-    train_positions = [unit_sphere(theta,phi) for theta in np.linspace(np.pi/8, np.pi/3, 4) for phi in np.linspace(0, 2 * np.pi, 4)]
+    renderer = DiffuseSceneRenderer()
+    train_positions = [unit_sphere(theta,phi) for theta in np.linspace(np.pi/8, np.pi/3, 16) for phi in np.linspace(0, 2 * np.pi, 16)]
     train_image_dir = "train_images"
     print("Generating Training Images:")
     render_and_save(renderer, train_image_dir, train_positions)
