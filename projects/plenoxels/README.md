@@ -1,6 +1,6 @@
 # Plenoxels Implementation
 ### Basic Approach (Differentiable Volumetric Renderer)
-The scene is represented by a radiance field $R(x, d)$ and density $\sigma(x)$. Here $x \in \mathbb{R}^3$ is the position in the volume and $d \in \mathbb{S}^2$ is the viewing direction. The accumulated radiance along a ray $\{x + td\ \mid t \in [t_0, t_1]\}$ is given by
+The scene is represented by a radiance field $R(x, d)$ and density $\sigma(x)$. Here $x \in \mathbb{R}^3$ is the position in the volume and $d \in \mathbb{S}^2$ is the viewing direction. The accumulated radiance along a ray $`\{x + td\ \mid t \in [t_0, t_1]\}`$ is given by
 
 $$
 I(x,\  d) = \int_{t_0}^{t_1} T(x,\ d,\ t)\  R(x + td,\  d) \ dt,
