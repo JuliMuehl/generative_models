@@ -1,8 +1,7 @@
 ## Reconstruction of a Scene with Specular Highlights
-<center>
 <img src="md_assets/specular.gif">
 Credits: The shader on the right is based on  [this shader](https://www.shadertoy.com/view/lstXRl)
-</center>
+
 
 
 ## Reconstruction of a Diffuse Scene
