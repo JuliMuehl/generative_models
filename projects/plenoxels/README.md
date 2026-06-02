@@ -2,10 +2,7 @@
 <center>
 <figure>
 <img src="md_assets/specular.gif">
-<figcaption>
 Credits: The shader on the right is based on  [this shader](https://www.shadertoy.com/view/lstXRl)
-</figcaption>
-</figure>
 </center>
 
 
