@@ -1,5 +1,3 @@
-# Plenoxels Implementation
-
 ## Reconstruction of a Scene with Specular Highlights
 <center>
 <figure>
