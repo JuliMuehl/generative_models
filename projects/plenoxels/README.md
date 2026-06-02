@@ -23,7 +23,9 @@ $$
 
 where 
 
-$$x = h ( \begin{bmatrix} i \\ j \\ k\end{bmatrix} + \begin{bmatrix} u \\ v \\ w\end{bmatrix})$$ 
+$$
+x = h ( \begin{bmatrix} i \\ j \\ k\end{bmatrix} + \begin{bmatrix} u \\ v \\ w\end{bmatrix})
+$$ 
 
 for $u,\ v,\ w \in (0,1)$ and 
 
