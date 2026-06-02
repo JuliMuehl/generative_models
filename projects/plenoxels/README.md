@@ -46,7 +46,10 @@ for $u,\ v,\ w \in (0,1)$ and
 
 $$\begin{bmatrix} i \\ j \\ k \end{bmatrix} = \text{floor}(h^{-1}x).$$
 
-To reduce artifacts the grid functions are penalized with a [total variation](https://en.wikipedia.org/wiki/Total_variation) regularization of the form $$\int |\nabla f| \ dx.$$
+To reduce artifacts the grid functions are penalized with a [total variation](https://en.wikipedia.org/wiki/Total_variation) regularization of the form 
+
+$$\int |\nabla f| \ dx.$$
+
 The gradient $\nabla f$ is approximated by finite differences from $F_{ijk}$.
 
 The density $\sigma$ and radiance $R$ are both parametrizied using the above formulas. However in the specular/plenoptic case where $R$ depends on the viewing direction trilinear interpolation is instead used to interpolate [spherical harmonics coefficients](https://en.wikipedia.org/wiki/Spherical_harmonics) instead of directly interpolating the radiance.
