@@ -1,21 +1,34 @@
 # Plenoxels Implementation
 ### Basic Approach (Differentiable Volumetric Renderer)
-The scene is represented by a radiance field $R(x, d)$ and density $\sigma(x)$. Here $x \in \R^3$ is the position in the volume and $d \in \mathbb{S}^2$ is the viewing direction. The accumulated radiance along a ray $\{x + td\ \mid t \in [t_0, t_1]\}$ is given by.
+The scene is represented by a radiance field $R(x, d)$ and density $\sigma(x)$. Here $x \in \mathbb{R}^3$ is the position in the volume and $d \in \mathbb{S}^2$ is the viewing direction. The accumulated radiance along a ray $\{x + td\ \mid t \in [t_0, t_1]\}$ is given by
+
 $$
-I(x,\  d) = \int_{t}^{t_1} T(x,\ d,\ t)\  R(x + td,\  d) \ dt,
+I(x,\  d) = \int_{t_0}^{t_1} T(x,\ d,\ t)\  R(x + td,\  d) \ dt,
 $$
+
 with
+
 $$
 T(x,\ d,\ t) = \exp(-\int_{t_0}^t \sigma(x + sd)\  ds)
 $$
+
 Here $T$ is called transmittance and the integrals are approximated by quadrature rules in practice.\
-Given a differentiable parameterization $R(x, d, \theta)$, $\sigma(x, d, \theta)$ the goal is to minimize the difference between $I(x_j, d_j, \theta)$ and $\hat{I_j}$ for groundtruth measurements $(\hat{I_j})_{j=1...N}$ from real images  corresponding to rays $(x_j, d_j)_{j=1...N}$ in order to recover $\theta$.
+Given a differentiable parameterization $R(x, d, \theta)$, $\sigma(x, d, \theta)$ the goal is to minimize the difference between $I(x_j, d_j, \theta)$ and $\hat{I_j}$ for groundtruth measurements $\hat{I_j}$ from real images  corresponding to rays $(x_j, d_j)_{j=1...N}$ in order to recover $\theta$.
 ### Parameterization (Voxel Grid with Trilinear Interpolation)
 Trilinear interpolation on a grid $F_{i, j, k}$ with spacing $h > 0$ is given by
+
 $$
 f(x) = \sum_{l=0}^1\sum_{m=0}^1\sum_{n=0}^1 u^{l}(1-u)^{1-l} v^{l}(1-m)^{1-m} w^{n}(1-w)^{1-n} F_{i+l, j+m, k+n}
 $$
-where $x = h ( \begin{bmatrix} i \\ j \\ k\end{bmatrix} + \begin{bmatrix} u \\ v \\ w\end{bmatrix})$ for $u,\ v,\ w \in (0,1)$ and $\begin{bmatrix} i \\ j \\ k\end{bmatrix} = \text{floor}(h^{-1}x)$.\
+
+where 
+
+$$x = h ( \begin{bmatrix} i \\ j \\ k\end{bmatrix} + \begin{bmatrix} u \\ v \\ w\end{bmatrix})$$ 
+
+for $u,\ v,\ w \in (0,1)$ and 
+
+$$\begin{bmatrix} i \\ j \\ k \end{bmatrix} = \text{floor}(h^{-1}x).$$
+
 To reduce artifacts the grid functions are penalized with a [total variation](https://en.wikipedia.org/wiki/Total_variation) regularization of the form $$\int |\nabla f| \ dx.$$
 The gradient $\nabla f$ is approximated by finite differences from $F_{ijk}$.
 
