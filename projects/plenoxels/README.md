@@ -1,4 +1,23 @@
 # Plenoxels Implementation
+
+## Reconstruction of a Scene with Specular Highlights
+<center>
+<figure>
+<img src="md_assets/specular.gif">
+<figcaption>
+Credits: The shader on the right is based on  
+
+[this shader](https://www.shadertoy.com/view/lstXRl)
+</figcaption>
+</figure>
+</center>
+
+
+## Reconstruction of a Diffuse Scene
+<center>
+<img width=480 src="md_assets/plenoxels_demo.gif">
+</center>
+
 ### Basic Approach (Differentiable Volumetric Renderer)
 The scene is represented by a radiance field $R(x, d)$ and density $\sigma(x)$. Here $x \in \mathbb{R}^3$ is the position in the volume and $d \in \mathbb{S}^2$ is the viewing direction. The accumulated radiance along a ray $\{x + td\ \mid t \in [t_0, t_1]\}$ is given by
 
@@ -33,23 +52,6 @@ To reduce artifacts the grid functions are penalized with a [total variation](ht
 The gradient $\nabla f$ is approximated by finite differences from $F_{ijk}$.
 
 The density $\sigma$ and radiance $R$ are both parametrizied using the above formulas. However in the specular/plenoptic case where $R$ depends on the viewing direction trilinear interpolation is instead used to interpolate [spherical harmonics coefficients](https://en.wikipedia.org/wiki/Spherical_harmonics) instead of directly interpolating the radiance.
-## Reconstruction of a Scene with Specular Highlights
-<center>
-<figure>
-<img src="md_assets/specular.gif">
-<figcaption>
-Credits: The shader on the right is based on  
-
-[this shader](https://www.shadertoy.com/view/lstXRl)
-</figcaption>
-</figure>
-</center>
-
-
-## Reconstruction of a Diffuse Scene
-<center>
-<img width=480 src="md_assets/plenoxels_demo.gif">
-</center>
 
 ## Training and Visualization
 First cd into the directory for the diffuse or specular model. Training the diffuse model requires fewer training iterations, and less GPU memory.
