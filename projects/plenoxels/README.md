@@ -56,7 +56,7 @@ The density $\sigma$ and radiance $R$ are both parametrizied using the above for
 ## Training and Visualization
 First cd into the directory for the diffuse or specular model. Training the diffuse model requires fewer training iterations, and less GPU memory.
 ```bash
-$ cd specular
+$ cd plenoptic
 ```
 or
 ```bash
