@@ -14,7 +14,6 @@ class GaussianPosteriorLayer(torch.nn.Module):
         kl_loss = 0.5 * (self.dim * torch.sum(sigma**2) + torch.sum(mu**2) - 2 * self.dim * torch.sum(torch.log(sigma)))
         return mu, sigma, kl_loss
 
-
 class VariationalAutoencoder(torch.nn.Module):
     def __init__(self, encoder, decoder, latent_shape):
         super().__init__()
