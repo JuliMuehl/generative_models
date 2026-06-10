@@ -1,9 +1,9 @@
 This repository serves as an educational implementation of various probabalistic and 3D vision based generative models in PyTorch.
 
 ## Projects
-* [Plenoxels (Neural Radiance fields without neural networks)](projects/plenoxels)
-* [Wasserstein GAN on CIFAR10 automobile class](projects/wdcgan_cifar10)
-* [1D Training visualization for Wasserstein- and Jensen-Shannon GAN](projects/gan_example)
+* [Plenoxels (Neural Radiance Fields without Neural Networks)](projects/plenoxels)
+* [Wasserstein GAN on CIFAR10 Automobile Class](projects/wdcgan_cifar10)
+* [1D Training Visualization for Wasserstein- and Jensen-Shannon GAN](projects/gan_example)
 * [Variational Autoencoders](projects/variational_mnist)
 
 ## Installation
