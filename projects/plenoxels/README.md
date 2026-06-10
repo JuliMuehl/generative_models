@@ -18,7 +18,7 @@ Given a differentiable parameterization $R(x, d, \theta)$, $\sigma(x, d, \theta)
 Trilinear interpolation on a grid $F_{i, j, k}$ with spacing $h > 0$ is given by
 
 $$
-f(x) = \sum_{l=0}^1\sum_{m=0}^1\sum_{n=0}^1 u^{l}(1-u)^{1-l} v^{l}(1-m)^{1-m} w^{n}(1-w)^{1-n} F_{i+l, j+m, k+n}
+f(x) = \sum_{l=0}^1\sum_{m=0}^1\sum_{n=0}^1 u^{l}(1-u)^{1-l} v^{m}(1-v)^{1-m} w^{n}(1-w)^{1-n} F_{i+l, j+m, k+n}
 $$
 
 where 
@@ -58,7 +58,7 @@ The density $\sigma$ and radiance $R$ are both parametrizied using the above for
 ## Training and Visualization
 First cd into the directory for the diffuse or specular model. Training the diffuse model requires fewer training iterations, and less GPU memory.
 ```bash
-$ cd specular
+$ cd plenoptic
 ```
 or
 ```bash
