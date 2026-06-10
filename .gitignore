@@ -8,3 +8,4 @@ src/generative_models.egg-info
 projects/plenoxels/diffuse/train_images
 projects/plenoxels/plenoptic/train_images
 projects/wdcgan_cifar10/cifar10_data
+projects/wdcgan_cifar10/saves
