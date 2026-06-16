@@ -9,26 +9,26 @@ This repository serves as an educational implementation of various probabalistic
 ## Installation
 To simplify installing the necessary dependencies it is recommended to first create a new virtualenv
 
-`bash
+```bash
 python -m virtualenv venv
-`
+```
 
 Install the requirements by running 
 
-`bash
+```bash
 pip install -r requirements.txt 
-`
+```
 
 or
 
-`bash
+```bash
 pip install -r requirements_xpu.txt 
-`
+```
 
 if you are using an intel gpu/xpu.
 
 You can now install the main package from the *src/* directory by running
 
-`bash
+```bash
 pip install -e .
-`
+```
