@@ -7,7 +7,7 @@ $$
 g_\theta(x) : \mathbb{R}^{l} \rightarrow \mathbb{R}^d \text{ and } d_{\phi}(x) : \mathbb{R}^d \rightarrow \mathbb{R}.
 $$
 
-The map is $d_\phi$ is called discriminator or critic and $g_\theta$ is called generator. It induces a pushforward measure $\mu_G = g_{\theta} \\# \mathcal{N}(0, I^l)$ on $\mathbb{R}^d$. The goal is to minimize the Wasserstein (earth-movers) distance using gradient based techniques
+The map is $d_\phi$ is called discriminator or critic and $g_\theta$ is called generator. It induces a pushforward measure $\mu_G = g_{\theta} \\# \mathcal{N}(0, I^l)$ on $\mathbb{R}^d$. The goal is to minimize the Wasserstein (earth-movers) distance with respect to $\theta$ using gradient based techniques
 
 $$
 W_1(\mu_G,\ \mu_{data}) = \inf_{\gamma\ \in\  \Gamma(\mu_G, \mu_{data})} \mathbb{E}_{X,\ Y \sim \gamma}[|X-Y|_2].
